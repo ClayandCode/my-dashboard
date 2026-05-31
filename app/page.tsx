@@ -1,65 +1,132 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useRef, useCallback } from 'react'
+import TopRail from '@/components/dashboard/TopRail'
+import { Col } from '@/components/dashboard/Shell'
+import OperatorCard from '@/components/dashboard/cards/OperatorCard'
+import FinancePulseCard from '@/components/dashboard/cards/FinancePulseCard'
+import KeyBlockersCard from '@/components/dashboard/cards/KeyBlockersCard'
+import SessionCard from '@/components/dashboard/cards/SessionCard'
+import HabitTrackerCard from '@/components/dashboard/cards/HabitTrackerCard'
+import PrioritiesCard from '@/components/dashboard/cards/PrioritiesCard'
+import NutritionCard from '@/components/dashboard/cards/NutritionCard'
+import AICoachBubble from '@/components/dashboard/cards/AICoachBubble'
+
+const HABITS_TOTAL = 6
+
+type CaptureStatus = 'idle' | 'loading' | 'ok' | 'error'
+
+const TYPE_LABEL: Record<string, string> = {
+  task: '✅ Task saved',
+  note: '📝 Note saved',
+  meal: '🍽️ Meal logged',
+  journal: '📓 Journal entry saved',
+  blocker: '🚧 Blocker noted',
+  finance: '💰 Finance note saved',
+}
+
+export default function DashboardPage() {
+  const [habitsDone] = useState(4)
+  const [captureText, setCaptureText] = useState('')
+  const [captureStatus, setCaptureStatus] = useState<CaptureStatus>('idle')
+  const [captureLabel, setCaptureLabel] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  async function submit() {
+    const text = captureText.trim()
+    if (!text || captureStatus === 'loading') return
+    setCaptureStatus('loading')
+    try {
+      const res = await fetch('/api/capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setCaptureLabel(TYPE_LABEL[data.classification?.type] ?? '✓ Saved')
+      setCaptureStatus('ok')
+      setCaptureText('')
+    } catch {
+      setCaptureLabel('⚠️ Failed to save')
+      setCaptureStatus('error')
+    }
+    setTimeout(() => { setCaptureStatus('idle'); setCaptureLabel('') }, 3000)
+  }
+
+  const barColor = captureStatus === 'ok'
+    ? 'var(--ok)'
+    : captureStatus === 'error'
+    ? 'var(--danger)'
+    : 'var(--border)'
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <TopRail />
+
+      <main style={{
+        maxWidth: 1380,
+        margin: '0 auto',
+        padding: '14px 16px 100px',
+        display: 'grid',
+        gridTemplateColumns: '270px 1fr 250px',
+        gap: 'var(--gap)',
+      }}>
+        <Col>
+          <OperatorCard />
+          <FinancePulseCard />
+          <KeyBlockersCard />
+        </Col>
+
+        <Col>
+          <SessionCard />
+          <HabitTrackerCard />
+          <PrioritiesCard />
+        </Col>
+
+        <Col>
+          <NutritionCard />
+        </Col>
       </main>
-    </div>
-  );
+
+      {/* Floating capture bar */}
+      <div style={{
+        position: 'fixed', bottom: 20, left: '50%',
+        transform: 'translateX(-50%)', width: 540, zIndex: 200,
+      }}>
+        <div style={{
+          display: 'flex', gap: 8, alignItems: 'center',
+          background: 'var(--surface)', border: `1px solid ${barColor}`,
+          borderRadius: 14, padding: '10px 14px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)',
+          transition: 'border-color 0.2s',
+        }}>
+          <span style={{ fontSize: 15, color: captureStatus === 'loading' ? 'var(--accent)' : 'var(--ink-4)' }}>
+            {captureStatus === 'loading' ? '⏳' : '⌘'}
+          </span>
+          {captureStatus === 'ok' || captureStatus === 'error' ? (
+            <span style={{ flex: 1, fontSize: 13, color: captureStatus === 'ok' ? 'var(--ok)' : 'var(--danger)', fontWeight: 500 }}>
+              {captureLabel}
+            </span>
+          ) : (
+            <input
+              ref={inputRef}
+              type="text"
+              value={captureText}
+              onChange={e => setCaptureText(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && submit()}
+              placeholder="Capture anything — task, idea, note, meal..."
+              style={{
+                flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                fontSize: 13, color: 'var(--ink-0)', fontFamily: 'inherit',
+              }}
+            />
+          )}
+          <span style={{ fontSize: 11, color: 'var(--ink-4)', flexShrink: 0 }}>⏎ to send</span>
+        </div>
+      </div>
+
+      <AICoachBubble habitsDone={habitsDone} habitsTotal={HABITS_TOTAL} />
+    </>
+  )
 }
