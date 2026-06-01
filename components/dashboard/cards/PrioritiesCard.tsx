@@ -10,11 +10,13 @@ interface Goal {
   completed_at: string | null
 }
 
-function GoalSection({ title, goals, onToggle }: {
+function GoalSection({ title, goals, onToggle, onDelete }: {
   title: string
   goals: Goal[]
   onToggle: (id: string, done: boolean) => void
+  onDelete: (id: string) => void
 }) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
   if (goals.length === 0) return null
   return (
     <div style={{ marginBottom: 14 }}>
@@ -26,6 +28,8 @@ function GoalSection({ title, goals, onToggle }: {
         return (
           <div
             key={goal.id}
+            onMouseEnter={() => setHoveredId(goal.id)}
+            onMouseLeave={() => setHoveredId(null)}
             style={{
               display: 'flex', alignItems: 'center', gap: 9, padding: '7px 0',
               borderBottom: i < goals.length - 1 ? '1px solid var(--border)' : 'none',
@@ -51,6 +55,16 @@ function GoalSection({ title, goals, onToggle }: {
             }}>
               {goal.title}
             </span>
+            <button
+              onClick={() => onDelete(goal.id)}
+              style={{
+                opacity: hoveredId === goal.id ? 1 : 0,
+                width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
+                background: 'var(--surface-2)', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 9, color: 'var(--ink-3)', transition: 'opacity 0.15s',
+              }}
+            >✕</button>
           </div>
         )
       })}
@@ -80,6 +94,11 @@ export default function PrioritiesCard() {
     })
   }
 
+  async function deleteGoal(id: string) {
+    setGoals(prev => prev.filter(g => g.id !== id))
+    await fetch(`/api/goals/${id}`, { method: 'DELETE' })
+  }
+
   async function addGoal() {
     const title = newTitle.trim()
     if (!title || !adding) return
@@ -103,8 +122,8 @@ export default function PrioritiesCard() {
 
       {loading && <div style={{ color: 'var(--ink-4)', fontSize: 13 }}>Loading…</div>}
 
-      <GoalSection title="This Week" goals={week} onToggle={toggle} />
-      <GoalSection title="This Month" goals={month} onToggle={toggle} />
+      <GoalSection title="This Week" goals={week} onToggle={toggle} onDelete={deleteGoal} />
+      <GoalSection title="This Month" goals={month} onToggle={toggle} onDelete={deleteGoal} />
 
       {adding && (
         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
