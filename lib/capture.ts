@@ -98,7 +98,19 @@ export async function processCapture(
       .select('id')
       .single()
     routedId = tx?.id ?? null
-  } else if (classification.type === 'journal' || classification.type === 'note') {
+  } else if (classification.type === 'note') {
+    const { data: note } = await db
+      .from('notes')
+      .insert({
+        user_id: userId,
+        title: classification.title,
+        content: classification.body,
+        tags: classification.tags ?? [],
+      })
+      .select('id')
+      .single()
+    routedId = note?.id ?? null
+  } else if (classification.type === 'journal') {
     const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
 

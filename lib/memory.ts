@@ -23,6 +23,7 @@ export interface MemoryResult {
   id: string
   text: string
   source_type: string
+  source_id: string | null
   similarity: number
 }
 
