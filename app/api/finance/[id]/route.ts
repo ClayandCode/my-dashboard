@@ -1,5 +1,4 @@
 import { createServerClient } from '@/lib/supabase'
-import type { RouteContext } from 'next/server'
 
 export async function DELETE(_req: Request, ctx: RouteContext<'/api/finance/[id]'>) {
   const { id } = await ctx.params
