@@ -16,10 +16,13 @@ function GoalSection({ title, goals, onToggle, onDelete }: {
   onToggle: (id: string, done: boolean) => void
   onDelete: (id: string) => void
 }) {
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
   if (goals.length === 0) return null
   return (
     <div style={{ marginBottom: 14 }}>
+      <style>{`
+        .goal-row .delete-btn { opacity: 0; transition: opacity 0.15s; }
+        .goal-row:hover .delete-btn { opacity: 1; }
+      `}</style>
       <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 8 }}>
         {title}
       </div>
@@ -28,8 +31,7 @@ function GoalSection({ title, goals, onToggle, onDelete }: {
         return (
           <div
             key={goal.id}
-            onMouseEnter={() => setHoveredId(goal.id)}
-            onMouseLeave={() => setHoveredId(null)}
+            className="goal-row"
             style={{
               display: 'flex', alignItems: 'center', gap: 9, padding: '7px 0',
               borderBottom: i < goals.length - 1 ? '1px solid var(--border)' : 'none',
@@ -56,13 +58,13 @@ function GoalSection({ title, goals, onToggle, onDelete }: {
               {goal.title}
             </span>
             <button
+              className="delete-btn"
               onClick={() => onDelete(goal.id)}
               style={{
-                opacity: hoveredId === goal.id ? 1 : 0,
                 width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
                 background: 'var(--surface-2)', border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 9, color: 'var(--ink-3)', transition: 'opacity 0.15s',
+                fontSize: 9, color: 'var(--ink-3)',
               }}
             >✕</button>
           </div>
@@ -115,6 +117,7 @@ export default function PrioritiesCard() {
 
   const week = goals.filter(g => g.timeframe === 'week')
   const month = goals.filter(g => g.timeframe === 'month')
+  const quarter = goals.filter(g => g.timeframe === 'quarter')
 
   return (
     <Panel>
@@ -124,6 +127,7 @@ export default function PrioritiesCard() {
 
       <GoalSection title="This Week" goals={week} onToggle={toggle} onDelete={deleteGoal} />
       <GoalSection title="This Month" goals={month} onToggle={toggle} onDelete={deleteGoal} />
+      <GoalSection title="This Quarter" goals={quarter} onToggle={toggle} onDelete={deleteGoal} />
 
       {adding && (
         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
