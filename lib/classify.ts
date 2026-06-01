@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-export type CaptureType = 'task' | 'note' | 'meal' | 'journal' | 'blocker' | 'finance'
+export type CaptureType = 'task' | 'note' | 'meal' | 'journal' | 'blocker' | 'finance' | 'health'
 
 export interface Classification {
   type: CaptureType
@@ -13,6 +13,11 @@ export interface Classification {
   kcal?: number
   amount?: number
   category?: string
+  weight_lbs?: number
+  sleep_hours?: number
+  hrv?: number
+  energy?: number
+  water_oz?: number
 }
 
 const SYSTEM = `You are a personal assistant that classifies short text captures into structured data.
@@ -27,7 +32,12 @@ Return ONLY valid JSON with no markdown fences. Use this schema:
   "tags": ["tag1", "tag2"],                             // task only, 1-3 tags
   "kcal": number,                                        // meal only — estimated calories
   "amount": number,                                      // finance only — dollar amount if stated
-  "category": "income" | "expense" | "investment"       // finance only
+  "category": "income" | "expense" | "investment",      // finance only
+  "weight_lbs": number,                                  // health only
+  "sleep_hours": number,                                 // health only
+  "hrv": number,                                         // health only
+  "energy": number,                                      // health only — 1-10 scale
+  "water_oz": number                                     // health only
 }
 
 Classification rules:
@@ -36,7 +46,8 @@ Classification rules:
 - meal: food, drink, nutrition entry
 - journal: personal reflection, how the day is going, feelings
 - blocker: something blocking progress on a project or goal
-- finance: money, transaction, financial observation`
+- finance: money, transaction, financial observation
+- health: body metrics — weight, sleep, HRV, energy level, water intake`
 
 export async function classify(text: string): Promise<Classification> {
   if (process.env.ANTHROPIC_API_KEY) {
@@ -69,6 +80,7 @@ function keywordClassify(text: string): Classification {
   else if (/\b(feel|feeling|today was|reflection|grateful|mood|journal|diary)\b/.test(t)) type = 'journal'
   else if (/\b(blocked|blocking|stuck|waiting on|can't proceed|blocker)\b/.test(t)) type = 'blocker'
   else if (/\b(\$|dollar|money|paid|spent|earned|invoice|expense|income|budget)\b/.test(t)) type = 'finance'
+  else if (/\b(weigh(ed|t)|slept|sleep|hrv|energy level|water|oz|lbs|pounds|resting heart|recovery)\b/.test(t)) type = 'health'
 
   return {
     type,

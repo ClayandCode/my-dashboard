@@ -16,7 +16,7 @@ async function buildContext(): Promise<string> {
 
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)
 
-  const [tasksRes, habitsRes, logsRes, goalsRes, mealsRes, capturesRes, txnsRes] = await Promise.all([
+  const [tasksRes, habitsRes, logsRes, goalsRes, mealsRes, capturesRes, txnsRes, healthRes] = await Promise.all([
     db.from('tasks').select('title, urgency, key, time_estimate_min').eq('user_id', userId).is('completed_at', null).order('key', { ascending: false }).limit(15),
     db.from('habits').select('id, name, icon').eq('user_id', userId).eq('active', true).order('sort_order'),
     db.from('habit_logs').select('habit_id').eq('user_id', userId).eq('log_date', today),
@@ -24,6 +24,7 @@ async function buildContext(): Promise<string> {
     db.from('meals').select('name, kcal').eq('user_id', userId).eq('log_date', today).order('created_at'),
     db.from('raw_captures').select('raw_text, routed_to, created_at').eq('user_id', userId).gte('created_at', new Date(Date.now() - 86400000).toISOString()).order('created_at', { ascending: false }).limit(10),
     db.from('transactions').select('description, amount, category').eq('user_id', userId).gte('date', monthStart).order('date', { ascending: false }).limit(20),
+    db.from('health_logs').select('log_date, weight_lbs, sleep_hours, hrv, energy, water_oz').eq('user_id', userId).order('log_date', { ascending: false }).limit(7),
   ])
 
   const tasks = tasksRes.data ?? []
@@ -33,6 +34,7 @@ async function buildContext(): Promise<string> {
   const meals = mealsRes.data ?? []
   const captures = capturesRes.data ?? []
   const txns = txnsRes.data ?? []
+  const healthLogs = healthRes.data ?? []
 
   const taskLines = tasks.length
     ? tasks.map(t => `  ${t.key ? '[KEY] ' : ''}${t.title}${t.time_estimate_min ? ` (~${t.time_estimate_min}m)` : ''} [${t.urgency}]`).join('\n')
@@ -81,6 +83,17 @@ ${mealLines}
 
 FINANCES THIS MONTH:
 ${financeSection}
+
+HEALTH (last 7 days):
+${healthLogs.length ? healthLogs.map(h => {
+  const parts = []
+  if (h.weight_lbs) parts.push(`${h.weight_lbs}lbs`)
+  if (h.sleep_hours) parts.push(`sleep ${h.sleep_hours}h`)
+  if (h.hrv) parts.push(`HRV ${h.hrv}`)
+  if (h.energy) parts.push(`energy ${h.energy}/10`)
+  if (h.water_oz) parts.push(`water ${h.water_oz}oz`)
+  return `  ${h.log_date}: ${parts.join(', ') || 'no data'}`
+}).join('\n') : '  (no health data logged)'}
 
 RECENT ACTIVITY (last 24h):
 ${recentLines}`

@@ -62,6 +62,25 @@ export async function processCapture(
       .select('id')
       .single()
     routedId = task?.id ?? null
+  } else if (classification.type === 'health') {
+    const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
+    const payload: Record<string, unknown> = { user_id: userId, log_date: today }
+    if (classification.weight_lbs) payload.weight_lbs = classification.weight_lbs
+    if (classification.sleep_hours) payload.sleep_hours = classification.sleep_hours
+    if (classification.hrv) payload.hrv = classification.hrv
+    if (classification.energy) payload.energy = classification.energy
+    if (classification.water_oz) payload.water_oz = classification.water_oz
+    payload.notes = classification.body
+
+    const { data: existing } = await db.from('health_logs').select('id').eq('user_id', userId).eq('log_date', today).maybeSingle()
+    if (existing) {
+      await db.from('health_logs').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', existing.id)
+      routedId = existing.id
+    } else {
+      const { data: log } = await db.from('health_logs').insert(payload).select('id').single()
+      routedId = log?.id ?? null
+    }
   } else if (classification.type === 'finance') {
     const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
