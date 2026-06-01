@@ -14,13 +14,16 @@ async function buildContext(): Promise<string> {
     hour: 'numeric', minute: '2-digit',
   }).format(new Date())
 
-  const [tasksRes, habitsRes, logsRes, goalsRes, mealsRes, capturesRes] = await Promise.all([
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)
+
+  const [tasksRes, habitsRes, logsRes, goalsRes, mealsRes, capturesRes, txnsRes] = await Promise.all([
     db.from('tasks').select('title, urgency, key, time_estimate_min').eq('user_id', userId).is('completed_at', null).order('key', { ascending: false }).limit(15),
     db.from('habits').select('id, name, icon').eq('user_id', userId).eq('active', true).order('sort_order'),
     db.from('habit_logs').select('habit_id').eq('user_id', userId).eq('log_date', today),
     db.from('goals').select('title, timeframe, completed_at').eq('user_id', userId).order('sort_order'),
     db.from('meals').select('name, kcal').eq('user_id', userId).eq('log_date', today).order('created_at'),
     db.from('raw_captures').select('raw_text, routed_to, created_at').eq('user_id', userId).gte('created_at', new Date(Date.now() - 86400000).toISOString()).order('created_at', { ascending: false }).limit(10),
+    db.from('transactions').select('description, amount, category').eq('user_id', userId).gte('date', monthStart).order('date', { ascending: false }).limit(20),
   ])
 
   const tasks = tasksRes.data ?? []
@@ -29,6 +32,7 @@ async function buildContext(): Promise<string> {
   const goals = goalsRes.data ?? []
   const meals = mealsRes.data ?? []
   const captures = capturesRes.data ?? []
+  const txns = txnsRes.data ?? []
 
   const taskLines = tasks.length
     ? tasks.map(t => `  ${t.key ? '[KEY] ' : ''}${t.title}${t.time_estimate_min ? ` (~${t.time_estimate_min}m)` : ''} [${t.urgency}]`).join('\n')
@@ -54,6 +58,13 @@ async function buildContext(): Promise<string> {
     ? captures.map(c => `  [${c.routed_to}] ${c.raw_text}`).join('\n')
     : '  (no recent activity)'
 
+  const txIncome = txns.filter(t => t.category === 'income').reduce((s, t) => s + t.amount, 0)
+  const txExpenses = txns.filter(t => t.category === 'expense').reduce((s, t) => s + t.amount, 0)
+  const txInvested = txns.filter(t => t.category === 'investment').reduce((s, t) => s + t.amount, 0)
+  const financeSection = txns.length
+    ? `  Income: $${txIncome.toFixed(0)} | Expenses: $${txExpenses.toFixed(0)} | Invested: $${txInvested.toFixed(0)} | Net: $${(txIncome - txExpenses - txInvested).toFixed(0)}`
+    : '  (no transactions logged this month)'
+
   return `── ${now} (Mountain Time) ──
 
 OPEN TASKS (${tasks.length} total, ${keyCount} KEY):
@@ -67,6 +78,9 @@ ${goalSection}
 
 NUTRITION TODAY: ${totalKcal} kcal logged
 ${mealLines}
+
+FINANCES THIS MONTH:
+${financeSection}
 
 RECENT ACTIVITY (last 24h):
 ${recentLines}`

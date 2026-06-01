@@ -62,6 +62,23 @@ export async function processCapture(
       .select('id')
       .single()
     routedId = task?.id ?? null
+  } else if (classification.type === 'finance') {
+    const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
+    const { data: tx } = await db
+      .from('transactions')
+      .insert({
+        user_id: userId,
+        description: classification.title,
+        amount: Math.abs(classification.amount ?? 0),
+        category: classification.category ?? 'expense',
+        date: today,
+        notes: classification.body,
+        source,
+      })
+      .select('id')
+      .single()
+    routedId = tx?.id ?? null
   } else if (classification.type === 'journal' || classification.type === 'note') {
     const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
