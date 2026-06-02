@@ -11,6 +11,7 @@ import HabitTrackerCard from '@/components/dashboard/cards/HabitTrackerCard'
 import PrioritiesCard from '@/components/dashboard/cards/PrioritiesCard'
 import NutritionCard from '@/components/dashboard/cards/NutritionCard'
 import AICoachBubble from '@/components/dashboard/cards/AICoachBubble'
+import CalendarCard from '@/components/dashboard/cards/CalendarCard'
 
 const HABITS_TOTAL = 6
 
@@ -85,6 +86,7 @@ export default function DashboardPage() {
         </Col>
 
         <Col>
+          <CalendarCard />
           <NutritionCard />
         </Col>
       </main>
