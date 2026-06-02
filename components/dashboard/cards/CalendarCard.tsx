@@ -21,18 +21,21 @@ function fmtTime(iso: string, tz: string) {
 export default function CalendarCard() {
   const [events, setEvents] = useState<CalEvent[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   useEffect(() => {
     fetch('/api/calendar')
       .then(r => r.json())
       .then(d => {
-        if (Array.isArray(d)) setEvents(d)
-        else setError(true)
+        if (Array.isArray(d)) {
+          setEvents(d)
+        } else {
+          setErrorMsg(d?.message ?? d?.error ?? 'Unknown error')
+        }
         setLoading(false)
       })
-      .catch(() => { setError(true); setLoading(false) })
+      .catch(e => { setErrorMsg(String(e)); setLoading(false) })
   }, [])
 
   const now = new Date()
@@ -41,8 +44,8 @@ export default function CalendarCard() {
     <Panel>
       <PanelHeader label="Today" />
       {loading && <div style={{ color: 'var(--ink-4)', fontSize: 13 }}>Loading…</div>}
-      {error && <div style={{ color: 'var(--ink-4)', fontSize: 12 }}>Calendar not connected</div>}
-      {!loading && !error && events.length === 0 && (
+      {errorMsg && <div style={{ color: 'var(--ink-4)', fontSize: 11 }}>{errorMsg}</div>}
+      {!loading && !errorMsg && events.length === 0 && (
         <div style={{ color: 'var(--ink-4)', fontSize: 13 }}>Nothing scheduled today</div>
       )}
       {events.map(e => {
