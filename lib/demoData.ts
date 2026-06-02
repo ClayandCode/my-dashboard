@@ -10,12 +10,12 @@ export const DEMO_TASKS = [
 export const DEMO_HABITS = [
   {
     id: 'h1', name: 'Gym', icon: '🏋️', category: 'FITNESS', done: true,
-    time_estimate_min: 60, sort_order: 1,
+    time_estimate_min: 60, sort_order: 1, streak: 5,
     subtasks: [],
   },
   {
     id: 'h2', name: 'Supplements', icon: '💊', category: 'HEALTH', done: false,
-    time_estimate_min: undefined, sort_order: 2,
+    time_estimate_min: undefined, sort_order: 2, streak: 3,
     subtasks: [
       { id: 'h2s1', habit_id: 'h2', name: 'Morning vitamins', sort_order: 1, time_estimate_min: undefined, done: true },
       { id: 'h2s2', habit_id: 'h2', name: 'Protein shake', sort_order: 2, time_estimate_min: undefined, done: false },
@@ -24,7 +24,7 @@ export const DEMO_HABITS = [
   },
   {
     id: 'h3', name: 'Creative session', icon: '✨', category: 'OUTPUT', done: false,
-    time_estimate_min: undefined, sort_order: 3,
+    time_estimate_min: undefined, sort_order: 3, streak: 0,
     subtasks: [
       { id: 'h3s1', habit_id: 'h3', name: 'Market research', sort_order: 1, time_estimate_min: 15, done: false },
       { id: 'h3s2', habit_id: 'h3', name: 'Content ideas', sort_order: 2, time_estimate_min: 20, done: false },
@@ -33,7 +33,7 @@ export const DEMO_HABITS = [
   },
   {
     id: 'h4', name: 'Community session', icon: '🤝', category: 'CRM', done: false,
-    time_estimate_min: undefined, sort_order: 4,
+    time_estimate_min: undefined, sort_order: 4, streak: 2,
     subtasks: [
       { id: 'h4s1', habit_id: 'h4', name: 'Reply to DMs', sort_order: 1, time_estimate_min: 10, done: false },
       { id: 'h4s2', habit_id: 'h4', name: 'Engage with posts', sort_order: 2, time_estimate_min: 10, done: false },
@@ -43,7 +43,7 @@ export const DEMO_HABITS = [
   },
   {
     id: 'h5', name: 'Finance check', icon: '📊', category: 'OPS', done: false,
-    time_estimate_min: 25, sort_order: 5,
+    time_estimate_min: 25, sort_order: 5, streak: 1,
     subtasks: [
       { id: 'h5s1', habit_id: 'h5', name: 'Review portfolio', sort_order: 1, time_estimate_min: 10, done: false },
       { id: 'h5s2', habit_id: 'h5', name: 'Check for risks', sort_order: 2, time_estimate_min: 5, done: false },
@@ -54,7 +54,7 @@ export const DEMO_HABITS = [
   },
   {
     id: 'h6', name: 'Wind-down session', icon: '🌙', category: 'EVENING', done: false,
-    time_estimate_min: undefined, sort_order: 6,
+    time_estimate_min: undefined, sort_order: 6, streak: 0,
     subtasks: [
       { id: 'h6s1', habit_id: 'h6', name: 'Daily reflection', sort_order: 1, time_estimate_min: 10, done: false },
       { id: 'h6s2', habit_id: 'h6', name: 'Plan tomorrow', sort_order: 2, time_estimate_min: 5, done: false },
