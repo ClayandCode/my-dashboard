@@ -8,19 +8,48 @@ export const DEMO_TASKS = [
 ]
 
 export const DEMO_HABITS = [
-  { id: 'h1', name: 'Morning workout', icon: '💪', done: true },
-  { id: 'h2', name: 'Read 30 min', icon: '📚', done: true },
-  { id: 'h3', name: 'Cold shower', icon: '🚿', done: false },
-  { id: 'h4', name: 'No social media before noon', icon: '📵', done: true },
-  { id: 'h5', name: 'Journaling', icon: '✍️', done: false },
-  { id: 'h6', name: 'Supplements', icon: '💊', done: true },
+  {
+    id: 'h1', name: 'Morning workout', icon: '🏋️', done: true,
+    time_estimate_min: undefined, sort_order: 1,
+    subtasks: [
+      { id: 'h1s1', habit_id: 'h1', name: 'Warm-up stretches', sort_order: 1, time_estimate_min: 10, done: true },
+      { id: 'h1s2', habit_id: 'h1', name: 'Strength training', sort_order: 2, time_estimate_min: 35, done: true },
+      { id: 'h1s3', habit_id: 'h1', name: 'Cardio cooldown', sort_order: 3, time_estimate_min: 10, done: true },
+    ],
+  },
+  {
+    id: 'h2', name: 'Read 30 min', icon: '📚', done: false,
+    time_estimate_min: undefined, sort_order: 2,
+    subtasks: [
+      { id: 'h2s1', habit_id: 'h2', name: 'Non-fiction chapter', sort_order: 1, time_estimate_min: 20, done: true },
+      { id: 'h2s2', habit_id: 'h2', name: 'Highlight & notes', sort_order: 2, time_estimate_min: 10, done: false },
+    ],
+  },
+  {
+    id: 'h3', name: 'Cold shower', icon: '🚿', done: false,
+    time_estimate_min: 5, sort_order: 3,
+    subtasks: [],
+  },
+  {
+    id: 'h4', name: 'Journaling', icon: '✍️', done: true,
+    time_estimate_min: 15, sort_order: 4,
+    subtasks: [],
+  },
+  {
+    id: 'h5', name: 'Supplements', icon: '💊', done: true,
+    time_estimate_min: undefined, sort_order: 5,
+    subtasks: [
+      { id: 'h5s1', habit_id: 'h5', name: 'Morning stack', sort_order: 1, time_estimate_min: undefined, done: true },
+      { id: 'h5s2', habit_id: 'h5', name: 'Evening magnesium', sort_order: 2, time_estimate_min: undefined, done: true },
+    ],
+  },
 ]
 
 export const DEMO_NUTRITION = {
   meals: [
-    { id: 'm1', name: 'Greek yogurt + berries', kcal: 280, protein: 18, carbs: 32, fat: 8 },
-    { id: 'm2', name: 'Chicken & rice bowl', kcal: 520, protein: 42, carbs: 55, fat: 12 },
-    { id: 'm3', name: 'Protein shake', kcal: 180, protein: 30, carbs: 10, fat: 4 },
+    { id: 'm1', name: 'Greek yogurt + berries', kcal: 280, protein_g: 18, carbs_g: 32, fat_g: 8, created_at: todayAt(7, 30) },
+    { id: 'm2', name: 'Chicken & rice bowl', kcal: 520, protein_g: 42, carbs_g: 55, fat_g: 12, created_at: todayAt(12, 15) },
+    { id: 'm3', name: 'Protein shake', kcal: 180, protein_g: 30, carbs_g: 10, fat_g: 4, created_at: todayAt(15, 45) },
   ],
   target: { kcal: 2200, protein: 150, carbs: 200, fat: 70 },
 }

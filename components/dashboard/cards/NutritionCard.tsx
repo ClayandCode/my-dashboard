@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Panel, { PanelHeader } from '../Panel'
+import { useDemoMode } from '@/components/DemoContext'
+import { DEMO_NUTRITION } from '@/lib/demoData'
 
 interface Meal {
   id: string
@@ -10,11 +12,13 @@ interface Meal {
   protein_g?: number
   carbs_g?: number
   fat_g?: number
+  created_at?: string
 }
 
 const TARGET_KCAL = 2400
 
 export default function NutritionCard() {
+  const demo = useDemoMode()
   const [meals, setMeals] = useState<Meal[]>([])
   const [loading, setLoading] = useState(true)
   const [input, setInput] = useState('')
@@ -27,7 +31,14 @@ export default function NutritionCard() {
       .catch(() => setLoading(false))
   }, [])
 
-  useEffect(() => { loadMeals() }, [loadMeals])
+  useEffect(() => {
+    if (demo) {
+      setMeals(DEMO_NUTRITION.meals as Meal[])
+      setLoading(false)
+    } else {
+      loadMeals()
+    }
+  }, [demo, loadMeals])
 
   async function logMeal() {
     const text = input.trim()
@@ -90,21 +101,40 @@ export default function NutritionCard() {
         <div style={{ fontSize: 12, color: 'var(--ink-4)', padding: '8px 0' }}>No meals logged today</div>
       )}
 
-      {meals.map((meal, i) => (
-        <div
-          key={meal.id}
-          style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '8px 0',
-            borderBottom: i < meals.length - 1 ? '1px solid var(--border)' : 'none',
-          }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--ink-1)' }}>{meal.name}</span>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--ink-3)' }}>
-            {meal.kcal > 0 ? `${meal.kcal} kcal` : '—'}
-          </span>
-        </div>
-      ))}
+      {meals.map((meal, i) => {
+        const timeStr = meal.created_at
+          ? new Date(meal.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+          : null
+        return (
+          <div
+            key={meal.id}
+            style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+              padding: '8px 0',
+              borderBottom: i < meals.length - 1 ? '1px solid var(--border)' : 'none',
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--ink-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {meal.name}
+              </div>
+              {timeStr && (
+                <div style={{ fontSize: 10, color: 'var(--ink-4)', marginTop: 1 }}>{timeStr}</div>
+              )}
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--ink-3)' }}>
+                {meal.kcal > 0 ? `${meal.kcal} kcal` : '—'}
+              </div>
+              {(meal.protein_g || meal.carbs_g || meal.fat_g) && (
+                <div style={{ fontSize: 9, color: 'var(--ink-4)', marginTop: 1 }}>
+                  {meal.protein_g ? `P:${meal.protein_g}` : ''}{meal.carbs_g ? ` C:${meal.carbs_g}` : ''}{meal.fat_g ? ` F:${meal.fat_g}` : ''}g
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
 
       <div style={{ display: 'flex', gap: 7, marginTop: 10 }}>
         <input
