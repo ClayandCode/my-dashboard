@@ -90,3 +90,8 @@ body {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--ink-5); border-radius: 4px; }
+
+/* Confetti particles */
+@keyframes confetti-up   { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(-110px) rotate(600deg); opacity:0; } }
+@keyframes confetti-left { 0% { transform: translate(0,0) rotate(0deg); opacity:1; } 100% { transform: translate(-90px,-80px) rotate(-480deg); opacity:0; } }
+@keyframes confetti-right{ 0% { transform: translate(0,0) rotate(0deg); opacity:1; } 100% { transform: translate(90px,-80px) rotate(480deg); opacity:0; } }

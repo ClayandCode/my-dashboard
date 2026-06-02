@@ -8,7 +8,7 @@ export async function GET() {
 
   const [habitsRes, logsRes, subtasksRes, subtaskLogsRes] = await Promise.all([
     db.from('habits')
-      .select('id, name, icon, sort_order, time_estimate_min')
+      .select('id, name, icon, sort_order, time_estimate_min, category')
       .eq('user_id', userId)
       .eq('active', true)
       .order('sort_order'),

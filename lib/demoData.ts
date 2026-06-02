@@ -9,38 +9,57 @@ export const DEMO_TASKS = [
 
 export const DEMO_HABITS = [
   {
-    id: 'h1', name: 'Morning workout', icon: '🏋️', done: true,
-    time_estimate_min: undefined, sort_order: 1,
-    subtasks: [
-      { id: 'h1s1', habit_id: 'h1', name: 'Warm-up stretches', sort_order: 1, time_estimate_min: 10, done: true },
-      { id: 'h1s2', habit_id: 'h1', name: 'Strength training', sort_order: 2, time_estimate_min: 35, done: true },
-      { id: 'h1s3', habit_id: 'h1', name: 'Cardio cooldown', sort_order: 3, time_estimate_min: 10, done: true },
-    ],
+    id: 'h1', name: 'Gym', icon: '🏋️', category: 'FITNESS', done: true,
+    time_estimate_min: 60, sort_order: 1,
+    subtasks: [],
   },
   {
-    id: 'h2', name: 'Read 30 min', icon: '📚', done: false,
+    id: 'h2', name: 'Supplements', icon: '💊', category: 'HEALTH', done: false,
     time_estimate_min: undefined, sort_order: 2,
     subtasks: [
-      { id: 'h2s1', habit_id: 'h2', name: 'Non-fiction chapter', sort_order: 1, time_estimate_min: 20, done: true },
-      { id: 'h2s2', habit_id: 'h2', name: 'Highlight & notes', sort_order: 2, time_estimate_min: 10, done: false },
+      { id: 'h2s1', habit_id: 'h2', name: 'Morning vitamins', sort_order: 1, time_estimate_min: undefined, done: true },
+      { id: 'h2s2', habit_id: 'h2', name: 'Protein shake', sort_order: 2, time_estimate_min: undefined, done: false },
+      { id: 'h2s3', habit_id: 'h2', name: 'Evening magnesium', sort_order: 3, time_estimate_min: undefined, done: false },
     ],
   },
   {
-    id: 'h3', name: 'Cold shower', icon: '🚿', done: false,
-    time_estimate_min: 5, sort_order: 3,
-    subtasks: [],
-  },
-  {
-    id: 'h4', name: 'Journaling', icon: '✍️', done: true,
-    time_estimate_min: 15, sort_order: 4,
-    subtasks: [],
-  },
-  {
-    id: 'h5', name: 'Supplements', icon: '💊', done: true,
-    time_estimate_min: undefined, sort_order: 5,
+    id: 'h3', name: 'Creative session', icon: '✨', category: 'OUTPUT', done: false,
+    time_estimate_min: undefined, sort_order: 3,
     subtasks: [
-      { id: 'h5s1', habit_id: 'h5', name: 'Morning stack', sort_order: 1, time_estimate_min: undefined, done: true },
-      { id: 'h5s2', habit_id: 'h5', name: 'Evening magnesium', sort_order: 2, time_estimate_min: undefined, done: true },
+      { id: 'h3s1', habit_id: 'h3', name: 'Market research', sort_order: 1, time_estimate_min: 15, done: false },
+      { id: 'h3s2', habit_id: 'h3', name: 'Content ideas', sort_order: 2, time_estimate_min: 20, done: false },
+      { id: 'h3s3', habit_id: 'h3', name: 'Draft & schedule', sort_order: 3, time_estimate_min: 25, done: false },
+    ],
+  },
+  {
+    id: 'h4', name: 'Community session', icon: '🤝', category: 'CRM', done: false,
+    time_estimate_min: undefined, sort_order: 4,
+    subtasks: [
+      { id: 'h4s1', habit_id: 'h4', name: 'Reply to DMs', sort_order: 1, time_estimate_min: 10, done: false },
+      { id: 'h4s2', habit_id: 'h4', name: 'Engage with posts', sort_order: 2, time_estimate_min: 10, done: false },
+      { id: 'h4s3', habit_id: 'h4', name: 'Post update', sort_order: 3, time_estimate_min: 10, done: false },
+      { id: 'h4s4', habit_id: 'h4', name: 'Check referrals', sort_order: 4, time_estimate_min: 5, done: false },
+    ],
+  },
+  {
+    id: 'h5', name: 'Finance check', icon: '📊', category: 'OPS', done: false,
+    time_estimate_min: 25, sort_order: 5,
+    subtasks: [
+      { id: 'h5s1', habit_id: 'h5', name: 'Review portfolio', sort_order: 1, time_estimate_min: 10, done: false },
+      { id: 'h5s2', habit_id: 'h5', name: 'Check for risks', sort_order: 2, time_estimate_min: 5, done: false },
+      { id: 'h5s3', habit_id: 'h5', name: 'Log net worth', sort_order: 3, time_estimate_min: 5, done: false },
+      { id: 'h5s4', habit_id: 'h5', name: 'Review spending', sort_order: 4, time_estimate_min: 5, done: false },
+      { id: 'h5s5', habit_id: 'h5', name: 'Finance dashboard', sort_order: 5, time_estimate_min: 5, done: false },
+    ],
+  },
+  {
+    id: 'h6', name: 'Wind-down session', icon: '🌙', category: 'EVENING', done: false,
+    time_estimate_min: undefined, sort_order: 6,
+    subtasks: [
+      { id: 'h6s1', habit_id: 'h6', name: 'Daily reflection', sort_order: 1, time_estimate_min: 10, done: false },
+      { id: 'h6s2', habit_id: 'h6', name: 'Plan tomorrow', sort_order: 2, time_estimate_min: 5, done: false },
+      { id: 'h6s3', habit_id: 'h6', name: 'Read 20 min', sort_order: 3, time_estimate_min: 20, done: false },
+      { id: 'h6s4', habit_id: 'h6', name: 'No screens 30 min', sort_order: 4, time_estimate_min: 30, done: false },
     ],
   },
 ]
