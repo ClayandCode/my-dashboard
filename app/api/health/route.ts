@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase'
+import { saveMemory } from '@/lib/memory'
 
 function todayTz() {
   const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
@@ -49,5 +50,20 @@ export async function PUT(request: Request) {
   }
 
   if (result.error) return Response.json({ error: result.error.message }, { status: 500 })
+
+  const d = result.data
+  if (d) {
+    const parts: string[] = []
+    if (d.weight_lbs) parts.push(`weight ${d.weight_lbs}lbs`)
+    if (d.sleep_hours) parts.push(`sleep ${d.sleep_hours}h`)
+    if (d.hrv) parts.push(`HRV ${d.hrv}`)
+    if (d.energy) parts.push(`energy ${d.energy}/10`)
+    if (d.water_oz) parts.push(`water ${d.water_oz}oz`)
+    if (d.notes) parts.push(d.notes)
+    if (parts.length > 0) {
+      saveMemory(`[health] ${d.log_date}: ${parts.join(', ')}`, 'health', d.id).catch(() => {})
+    }
+  }
+
   return Response.json(result.data)
 }

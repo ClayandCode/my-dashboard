@@ -2,9 +2,12 @@ import { parseICal, getEventsForDate } from '@/lib/ical'
 
 export const revalidate = 300
 
-export async function GET() {
+export async function GET(request: Request) {
   const url = process.env.GOOGLE_CALENDAR_ICAL_URL
   if (!url) return Response.json({ error: 'no_url', message: 'GOOGLE_CALENDAR_ICAL_URL not set in environment' }, { status: 503 })
+
+  const { searchParams } = new URL(request.url)
+  const dateParam = searchParams.get('date') // YYYY-MM-DD in user's local timezone
 
   try {
     const res = await fetch(url, { cache: 'no-store' })
@@ -13,9 +16,11 @@ export async function GET() {
 
     const tz = process.env.USER_TIMEZONE ?? 'America/Denver'
     const events = parseICal(text)
-    const today = getEventsForDate(events, new Date(), tz)
+    // Use noon on the target date to avoid DST edge cases
+    const targetDate = dateParam ? new Date(`${dateParam}T12:00:00`) : new Date()
+    const dayEvents = getEventsForDate(events, targetDate, tz)
 
-    return Response.json(today.map(e => ({
+    return Response.json(dayEvents.map(e => ({
       id: e.id,
       title: e.title,
       start: e.start.toISOString(),

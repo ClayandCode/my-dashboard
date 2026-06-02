@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { DemoContext } from '@/components/DemoContext'
 
 const TABS: { label: string; path: string }[] = [
   { label: 'Home',    path: '/' },
+  { label: 'Tasks',   path: '/tasks' },
   { label: 'Journal', path: '/journal' },
   { label: 'Health',  path: '/health' },
   { label: 'Finance', path: '/finance' },
@@ -15,6 +17,7 @@ const TABS: { label: string; path: string }[] = [
 export default function TopRail() {
   const router = useRouter()
   const pathname = usePathname()
+  const { demo, toggle: toggleDemo } = useContext(DemoContext)
   const [dark, setDark] = useState(false)
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
@@ -77,6 +80,21 @@ export default function TopRail() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 180, justifyContent: 'flex-end' }}>
+        {/* Demo mode toggle */}
+        <button
+          onClick={toggleDemo}
+          title={demo ? 'Exit demo mode' : 'Enter demo mode'}
+          style={{
+            padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700,
+            border: `1px solid ${demo ? 'var(--warn)' : 'var(--border)'}`,
+            background: demo ? 'var(--warn)' : 'transparent',
+            color: demo ? '#fff' : 'var(--ink-4)',
+            cursor: 'pointer', fontFamily: 'inherit', letterSpacing: 0.5,
+          }}
+        >
+          DEMO
+        </button>
+
         <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>{dark ? 'Light' : 'Dark'}</span>
         <button
           onClick={toggleTheme}

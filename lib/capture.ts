@@ -6,6 +6,7 @@ export interface CaptureResult {
   ok: boolean
   classification: Classification
   rawId: string
+  routedId: string | null
 }
 
 export async function processCapture(
@@ -150,5 +151,5 @@ export async function processCapture(
     ).catch(() => {})
   }
 
-  return { ok: true, classification, rawId: raw?.id ?? '' }
+  return { ok: true, classification, rawId: raw?.id ?? '', routedId: routedId ?? null }
 }
