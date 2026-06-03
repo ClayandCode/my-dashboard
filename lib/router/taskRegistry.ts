@@ -21,8 +21,8 @@ export const ENGINES: Record<EngineId, EngineConfig> = {
 }
 
 export const TASK_REGISTRY: Record<string, TaskConfig> = {
-  classifyCapture: { sensitivity: 'personal', tier: 'cheap',   fallback: ['quality'] },
-  enrichCapture:   { sensitivity: 'personal', tier: 'cheap',   fallback: ['quality'] },
+  classifyCapture: { sensitivity: 'personal', tier: 'quality', fallback: ['cheap']   },
+  enrichCapture:   { sensitivity: 'personal', tier: 'quality', fallback: ['cheap']   },
   tagNormalize:    { sensitivity: 'safe',     tier: 'cheap',   fallback: ['quality'] },
   gamifyCopy:      { sensitivity: 'safe',     tier: 'cheap',   fallback: ['quality'] },
   conceptExplain:  { sensitivity: 'safe',     tier: 'cheap',   fallback: ['quality'] },
