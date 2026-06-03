@@ -1,4 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { runTask, type RunTaskResult } from '@/lib/router/llmRouter'
+import type { EngineId } from '@/lib/router/taskRegistry'
 
 export type CaptureType = 'task' | 'note' | 'meal' | 'journal' | 'blocker' | 'finance' | 'health'
 
@@ -18,6 +19,11 @@ export interface Classification {
   hrv?: number
   energy?: number
   water_oz?: number
+}
+
+export interface ClassifyResult {
+  classification: Classification
+  engineUsed: EngineId
 }
 
 const SYSTEM = `You are a personal assistant that classifies short text captures into structured data.
@@ -49,27 +55,19 @@ Classification rules:
 - finance: money, transaction, financial observation
 - health: body metrics — weight, sleep, HRV, energy level, water intake`
 
-export async function classify(text: string): Promise<Classification> {
-  if (process.env.ANTHROPIC_API_KEY) {
-    try {
-      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-      const message = await client.messages.create({
-        model: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6',
-        max_tokens: 512,
-        system: SYSTEM,
-        messages: [{ role: 'user', content: text }],
-      })
-      const raw = message.content[0].type === 'text' ? message.content[0].text : ''
-      // Strip markdown fences if present
-      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-      return JSON.parse(cleaned) as Classification
-    } catch (err) {
-      console.warn('[classify] Claude failed, using keyword fallback:', err)
-    }
+export async function classify(text: string): Promise<ClassifyResult> {
+  try {
+    const result: RunTaskResult = await runTask('classifyCapture', {
+      system: SYSTEM,
+      prompt: text,
+      json: true,
+    })
+    const classification = JSON.parse(result.output) as Classification
+    return { classification, engineUsed: result.engineUsed }
+  } catch (err) {
+    console.warn('[classify] router failed, using keyword fallback:', err)
+    return { classification: keywordClassify(text), engineUsed: 'claude' }
   }
-
-  // Keyword fallback — no API needed
-  return keywordClassify(text)
 }
 
 function keywordClassify(text: string): Classification {

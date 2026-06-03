@@ -16,7 +16,7 @@ export async function processCapture(
   const userId = process.env.USER_ID!
   const db = createServerClient()
 
-  const classification = await classify(text)
+  const { classification, engineUsed } = await classify(text)
 
   const { data: raw } = await db
     .from('raw_captures')
@@ -25,7 +25,7 @@ export async function processCapture(
       source,
       raw_text: text,
       classification,
-      llm_source: 'anthropic',
+      llm_source: engineUsed,
       routed_to: classification.type,
     })
     .select('id')
