@@ -162,18 +162,28 @@ export default function HabitTrackerCard() {
 
   async function toggleHabit(habit: Habit) {
     if (habit.subtasks.length > 0) return
+    // Optimistic update for instant feel
     setHabits(prev => prev.map(h => h.id === habit.id ? { ...h, done: !h.done } : h))
-    if (!demo) await fetch(`/api/habits/${habit.id}/toggle`, { method: 'POST' })
+    if (!demo) {
+      await fetch(`/api/habits/${habit.id}/toggle`, { method: 'POST' })
+      // Re-fetch to get accurate streak after server writes habit_log
+      load()
+    }
   }
 
   async function toggleSubtask(habit: Habit, sub: Subtask) {
     const newDone = !sub.done
+    // Optimistic update for instant feel
     setHabits(prev => prev.map(h => {
       if (h.id !== habit.id) return h
       const newSubs = h.subtasks.map(s => s.id === sub.id ? { ...s, done: newDone } : s)
       return { ...h, subtasks: newSubs, done: newSubs.every(s => s.done) }
     }))
-    if (!demo) await fetch(`/api/habits/${habit.id}/subtasks/${sub.id}/toggle`, { method: 'POST' })
+    if (!demo) {
+      await fetch(`/api/habits/${habit.id}/subtasks/${sub.id}/toggle`, { method: 'POST' })
+      // Re-fetch to get accurate streak after server syncs habit_log
+      load()
+    }
   }
 
   const totalHabits  = habits.length
